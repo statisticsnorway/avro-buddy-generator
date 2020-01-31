@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class GenerateSyntheticDataTest {
 
-
     Schema schema = SchemaBuilder
             .record("root").namespace("no.ssb.data")
             .fields()
@@ -33,7 +32,6 @@ class GenerateSyntheticDataTest {
             .endRecord();
 
     static class TestInterceptor extends FieldInterceptor {
-
         @Override
         public String field(SchemaBuddy schema, int rowNum, int arrayElementNum) {
             String name = schema.getName();
@@ -49,11 +47,6 @@ class GenerateSyntheticDataTest {
         @Override
         public int getChildCount(int rowNum) {
             return 2;
-        }
-
-        @Override
-        public int onNewRow(int rowNum) {
-            return rowNum;
         }
     }
 

@@ -16,39 +16,22 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
         int getChildCount(int rowNum);
     }
 
-    public interface RowHandler {
-        int onNewRow(int rowNum);
-    }
-
-    public interface Interceptor extends FieldHandler, ChildCountHandler, RowHandler {
+    public interface Interceptor extends FieldHandler, ChildCountHandler {
 
     }
 
-    private Integer count = 0;
+    private int rowNum = 0;
 
     private final SchemaBuddy schemaBuddy;
     private final int numToGenerate;
     private final FieldHandler fieldHandler;
     private final ChildCountHandler childCountHandler;
-    private final RowHandler rowHandler;
 
     public GenerateSyntheticData(Schema schema, int numToGenerate, Interceptor interceptor) {
-        this(schema, numToGenerate, interceptor, interceptor);
-    }
-
-    public GenerateSyntheticData(Schema schema, int numToGenerate, FieldHandler fieldHandler, ChildCountHandler childCountHandler) {
-        this(schema, numToGenerate, fieldHandler, childCountHandler, null);
-    }
-
-    public GenerateSyntheticData(Schema schema, int numToGenerate, FieldHandler fieldHandler, ChildCountHandler childCountHandler, RowHandler rowHandler) {
-        schemaBuddy = SchemaBuddy.parse(schema);
+        this.schemaBuddy = SchemaBuddy.parse(schema);
         this.numToGenerate = numToGenerate;
-        this.childCountHandler = childCountHandler;
-        this.fieldHandler = fieldHandler;
-        if (rowHandler == null) {
-            rowHandler = rowNum -> count;
-        }
-        this.rowHandler = rowHandler;
+        this.fieldHandler = interceptor;
+        this.childCountHandler = interceptor;
     }
 
     public SchemaBuddy getSchemaBuddy() {
@@ -82,7 +65,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
     }
 
     String getData(SchemaBuddy schema, int arrayElementCount) {
-        return fieldHandler.field(schema, count, arrayElementCount);
+        return fieldHandler.field(schema, rowNum, arrayElementCount);
     }
 
     @Override
@@ -91,12 +74,12 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
         return new Iterator<>() {
             @Override
             public boolean hasNext() {
-                return count < numToGenerate;
+                return rowNum < numToGenerate;
             }
 
             @Override
             public DataElement next() {
-                rowHandler.onNewRow(count++);
+                rowNum++;
                 return generate();
             }
         };
