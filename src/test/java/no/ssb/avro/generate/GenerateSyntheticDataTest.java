@@ -2,6 +2,7 @@ package no.ssb.avro.generate;
 
 import no.ssb.avro.convert.core.DataElement;
 import no.ssb.avro.convert.core.SchemaAwareElement;
+import no.ssb.avro.convert.core.SchemaBuddy;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
@@ -31,17 +32,18 @@ class GenerateSyntheticDataTest {
             )
             .endRecord();
 
-    static class TestFieldChildHandler implements GenerateSyntheticData.FieldChildHandler {
+    static class TestFieldChildHandler extends FieldChildGenerator {
 
         @Override
-        public String field(Schema.Type type, String field, String value, int rowNum, int arrayElementNum) {
-            if (field.equals("sex")) {
+        public String field(SchemaBuddy schema, int rowNum, int arrayElementNum) {
+            String name = schema.getName();
+            if (name.equals("sex")) {
                 return "Male";
             }
-            if (field.equals("age")) {
+            if (name.equals("age")) {
                 return Integer.toString(rowNum * 10 + arrayElementNum);
             }
-            return value;
+            return generatedData(schema, rowNum, arrayElementNum);
         }
 
         @Override

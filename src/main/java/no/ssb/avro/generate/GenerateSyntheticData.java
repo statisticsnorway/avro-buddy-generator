@@ -8,10 +8,9 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class GenerateSyntheticData implements Iterable<DataElement> {
-    private RowHandler rowHandler;
 
     public interface FieldHandler {
-        String field(Schema.Type type, String field, String value, int rowNum, int arrayElementNum);
+        String field(SchemaBuddy schema, int rowNum, int arrayElementNum);
     }
 
     public interface ChildCountHandler {
@@ -28,13 +27,12 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
 
     private Integer count = 0;
 
-    private final Random random = new Random(0);
-
     private final SchemaBuddy schemaBuddy;
-
     private final int numToGenerate;
     private final FieldHandler fieldHandler;
     private final ChildCountHandler childCountHandler;
+    private final RowHandler rowHandler;
+
     public GenerateSyntheticData(Schema schema, int numToGenerate, FieldChildHandler fieldChildHandler) {
         this(schema, numToGenerate, fieldChildHandler, fieldChildHandler);
     }
@@ -84,21 +82,8 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
         return dataElement;
     }
 
-    String intercept(SchemaBuddy schemaBuddy, String defaultValue, int arrayElementNum) {
-        return fieldHandler.field(schemaBuddy.getType(), schemaBuddy.getName(), defaultValue, count, arrayElementNum);
-    }
-
     String getData(SchemaBuddy schema, int arrayElementCount) {
-        String generatedData = generatedData(schema, arrayElementCount);
-        return intercept(schema, generatedData, arrayElementCount);
-    }
-
-    private String generatedData(SchemaBuddy schema, int arrayElementCount) {
-        assert schema.isSimpleType();
-        if (schema.getType() == Schema.Type.STRING) {
-            return schema.getName() + "_" + count + "_" + arrayElementCount;
-        }
-        return Integer.toString(random.nextInt(100_000));
+        return fieldHandler.field(schema, count, arrayElementCount);
     }
 
     @Override
