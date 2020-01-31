@@ -34,12 +34,12 @@ class GenerateSyntheticDataTest {
     static class TestFieldChildHandler implements GenerateSyntheticData.FieldChildHandler {
 
         @Override
-        public String field(Schema.Type type, String field, String value, int rowNum) {
+        public String field(Schema.Type type, String field, String value, int rowNum, int arrayElementNum) {
             if (field.equals("sex")) {
                 return "Male";
             }
             if (field.equals("age")) {
-                return Integer.toString(rowNum);
+                return Integer.toString(rowNum * 10 + arrayElementNum);
             }
             return value;
         }
@@ -67,8 +67,8 @@ class GenerateSyntheticDataTest {
             result.add(genericRecord.toString());
         }
         assertThat(result).isEqualTo(List.of(
-                "{\"id\": \"id_1_0\", \"person\": [{\"name\": \"name_1_0\", \"sex\": \"Male\", \"age\": 1}, {\"name\": \"name_1_1\", \"sex\": \"Male\", \"age\": 1}]}",
-                "{\"id\": \"id_2_0\", \"person\": [{\"name\": \"name_2_0\", \"sex\": \"Male\", \"age\": 2}, {\"name\": \"name_2_1\", \"sex\": \"Male\", \"age\": 2}]}"
+                "{\"id\": \"id_1_0\", \"person\": [{\"name\": \"name_1_0\", \"sex\": \"Male\", \"age\": 10}, {\"name\": \"name_1_1\", \"sex\": \"Male\", \"age\": 11}]}",
+                "{\"id\": \"id_2_0\", \"person\": [{\"name\": \"name_2_0\", \"sex\": \"Male\", \"age\": 20}, {\"name\": \"name_2_1\", \"sex\": \"Male\", \"age\": 21}]}"
         ));
     }
 }

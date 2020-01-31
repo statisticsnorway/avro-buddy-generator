@@ -11,7 +11,7 @@ public class FieldChildGenerator implements GenerateSyntheticData.FieldChildHand
     int rowNumber = 0;
 
     @Override
-    public String field(Schema.Type type, String field, String defaultValue, int rowNumber) {
+    public String field(Schema.Type type, String field, String defaultValue, int rowNumber, int arrayElementNum) {
         switch (type) {
             case STRING:
                 return filedString(field, defaultValue);

@@ -11,7 +11,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
     private RowHandler rowHandler;
 
     public interface FieldHandler {
-        String field(Schema.Type type, String field, String value, int rowNum);
+        String field(Schema.Type type, String field, String value, int rowNum, int arrayElementNum);
     }
 
     public interface ChildCountHandler {
@@ -84,13 +84,13 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
         return dataElement;
     }
 
-    String intercept(SchemaBuddy schemaBuddy, String defaultValue) {
-        return fieldHandler.field(schemaBuddy.getType(), schemaBuddy.getName(), defaultValue, count);
+    String intercept(SchemaBuddy schemaBuddy, String defaultValue, int arrayElementNum) {
+        return fieldHandler.field(schemaBuddy.getType(), schemaBuddy.getName(), defaultValue, count, arrayElementNum);
     }
 
     String getData(SchemaBuddy schema, int arrayElementCount) {
         String generatedData = generatedData(schema, arrayElementCount);
-        return intercept(schema, generatedData);
+        return intercept(schema, generatedData, arrayElementCount);
     }
 
     private String generatedData(SchemaBuddy schema, int arrayElementCount) {
