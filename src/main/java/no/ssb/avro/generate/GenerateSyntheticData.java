@@ -5,7 +5,6 @@ import no.ssb.avro.convert.core.SchemaBuddy;
 import org.apache.avro.Schema;
 
 import java.util.Iterator;
-import java.util.Random;
 
 public class GenerateSyntheticData implements Iterable<DataElement> {
 
@@ -21,7 +20,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
         int onNewRow(int rowNum);
     }
 
-    public interface FieldChildHandler extends FieldHandler, ChildCountHandler, RowHandler {
+    public interface Interceptor extends FieldHandler, ChildCountHandler, RowHandler {
 
     }
 
@@ -33,8 +32,8 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
     private final ChildCountHandler childCountHandler;
     private final RowHandler rowHandler;
 
-    public GenerateSyntheticData(Schema schema, int numToGenerate, FieldChildHandler fieldChildHandler) {
-        this(schema, numToGenerate, fieldChildHandler, fieldChildHandler);
+    public GenerateSyntheticData(Schema schema, int numToGenerate, Interceptor interceptor) {
+        this(schema, numToGenerate, interceptor, interceptor);
     }
 
     public GenerateSyntheticData(Schema schema, int numToGenerate, FieldHandler fieldHandler, ChildCountHandler childCountHandler) {

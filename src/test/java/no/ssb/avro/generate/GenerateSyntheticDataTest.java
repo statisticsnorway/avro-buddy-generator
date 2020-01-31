@@ -32,7 +32,7 @@ class GenerateSyntheticDataTest {
             )
             .endRecord();
 
-    static class TestFieldChildHandler extends FieldChildGenerator {
+    static class TestInterceptor extends FieldInterceptor {
 
         @Override
         public String field(SchemaBuddy schema, int rowNum, int arrayElementNum) {
@@ -57,7 +57,7 @@ class GenerateSyntheticDataTest {
         }
     }
 
-    TestFieldChildHandler fieldChildGenerator = new TestFieldChildHandler();
+    TestInterceptor fieldChildGenerator = new TestInterceptor();
 
     @Test
     void testOverrideChangeOfFields() {

@@ -5,7 +5,7 @@ import org.apache.avro.Schema;
 
 import java.util.Random;
 
-public abstract class FieldChildGenerator implements GenerateSyntheticData.FieldChildHandler {
+public abstract class FieldInterceptor implements GenerateSyntheticData.Interceptor {
     private final Random random = new Random(0);
 
     protected String generatedData(SchemaBuddy schema, int rowNum, int arrayElementNum) {
