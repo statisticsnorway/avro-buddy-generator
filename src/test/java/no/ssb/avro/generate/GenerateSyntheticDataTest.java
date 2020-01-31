@@ -7,6 +7,11 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 class GenerateSyntheticDataTest {
 
 
@@ -26,7 +31,7 @@ class GenerateSyntheticDataTest {
             )
             .endRecord();
 
-    class TestFieldChildHandler implements GenerateSyntheticData.FieldChildHandler {
+    static class TestFieldChildHandler implements GenerateSyntheticData.FieldChildHandler {
 
         @Override
         public String field(Schema.Type type, String field, String value, int rowNum) {
@@ -53,15 +58,17 @@ class GenerateSyntheticDataTest {
     TestFieldChildHandler fieldChildGenerator = new TestFieldChildHandler();
 
     @Test
-    void testFieldHandler() {
+    void testOverrideChangeOfFields() {
         GenerateSyntheticData generateSyntheticData = new GenerateSyntheticData(schema, 2, fieldChildGenerator);
 
+        List<String> result = new ArrayList<>();
         for (DataElement element : generateSyntheticData) {
-//            System.out.println(element.toString(true));
-
             GenericRecord genericRecord = SchemaAwareElement.toRecord(element, generateSyntheticData.getSchemaBuddy());
-            System.out.println(genericRecord);
-
+            result.add(genericRecord.toString());
         }
+        assertThat(result).isEqualTo(List.of(
+                "{\"id\": \"id_1_0\", \"person\": [{\"name\": \"name_1_0\", \"sex\": \"Male\", \"age\": 1}, {\"name\": \"name_1_1\", \"sex\": \"Male\", \"age\": 1}]}",
+                "{\"id\": \"id_2_0\", \"person\": [{\"name\": \"name_2_0\", \"sex\": \"Male\", \"age\": 2}, {\"name\": \"name_2_1\", \"sex\": \"Male\", \"age\": 2}]}"
+        ));
     }
 }
