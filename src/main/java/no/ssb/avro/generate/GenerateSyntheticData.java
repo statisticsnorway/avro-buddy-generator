@@ -29,11 +29,12 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
     private Integer count = 0;
 
     private final Random random = new Random(0);
+
     private final SchemaBuddy schemaBuddy;
+
     private final int numToGenerate;
     private final FieldHandler fieldHandler;
     private final ChildCountHandler childCountHandler;
-
     public GenerateSyntheticData(Schema schema, int numToGenerate, FieldChildHandler fieldChildHandler) {
         this(schema, numToGenerate, fieldChildHandler, fieldChildHandler);
     }
@@ -51,6 +52,10 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
             rowHandler = rowNum -> count;
         }
         this.rowHandler = rowHandler;
+    }
+
+    public SchemaBuddy getSchemaBuddy() {
+        return schemaBuddy;
     }
 
     DataElement generate() {
@@ -80,7 +85,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
     }
 
     String intercept(SchemaBuddy schemaBuddy, String defaultValue) {
-        return fieldHandler.field(schemaBuddy.getType(), schemaBuddy.getName(), defaultValue, 0);
+        return fieldHandler.field(schemaBuddy.getType(), schemaBuddy.getName(), defaultValue, count);
     }
 
     String getData(SchemaBuddy schema, int arrayElementCount) {
