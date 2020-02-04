@@ -1,17 +1,13 @@
 package no.ssb.avro.generate;
 
 import no.ssb.avro.convert.core.DataElement;
-import no.ssb.avro.convert.core.SchemaAwareElement;
 import no.ssb.avro.convert.core.SchemaBuddy;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
-import org.apache.avro.generic.GenericRecord;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.registerCustomDateFormat;
 
 class GenerateSyntheticDataTest {
 
@@ -33,20 +29,23 @@ class GenerateSyntheticDataTest {
 
     static class TestInterceptor extends FieldInterceptor {
         @Override
-        public String field(SchemaBuddy schema, int rowNum, int arrayElementNum) {
+        protected GeneratedField handleField(SchemaBuddy schema, int rowNum, int arrayElementNum) {
             String name = schema.getName();
             if (name.equals("sex")) {
-                return "Male";
+                if (arrayElementNum == 0) return GeneratedField.missingStatus();
+                if (arrayElementNum == 1) return GeneratedField.nullStatus();
+                if (arrayElementNum == 2) return GeneratedField.shouldBeGenerated();
+                return new GeneratedField("Male");
             }
             if (name.equals("age")) {
-                return Integer.toString(rowNum * 10 + arrayElementNum);
+                return GeneratedField.fromInteger(rowNum * 10 + arrayElementNum);
             }
-            return generatedData(schema, rowNum, arrayElementNum);
+            return GeneratedField.shouldBeGenerated();
         }
 
         @Override
         public int getChildCount(int rowNum) {
-            return 2;
+            return 4;
         }
     }
 
@@ -56,14 +55,45 @@ class GenerateSyntheticDataTest {
     void testOverrideChangeOfFields() {
         GenerateSyntheticData generateSyntheticData = new GenerateSyntheticData(schema, 2, fieldChildGenerator);
 
-        List<String> result = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
         for (DataElement element : generateSyntheticData) {
-            GenericRecord genericRecord = SchemaAwareElement.toRecord(element, generateSyntheticData.getSchemaBuddy());
-            result.add(genericRecord.toString());
+            sb.append(element.toString(true) + "\n");
         }
-        assertThat(result).isEqualTo(List.of(
-                "{\"id\": \"id_1_0\", \"person\": [{\"name\": \"name_1_0\", \"sex\": \"Male\", \"age\": 10}, {\"name\": \"name_1_1\", \"sex\": \"Male\", \"age\": 11}]}",
-                "{\"id\": \"id_2_0\", \"person\": [{\"name\": \"name_2_0\", \"sex\": \"Male\", \"age\": 20}, {\"name\": \"name_2_1\", \"sex\": \"Male\", \"age\": 21}]}"
-        ));
+        assertThat(sb.toString()).isEqualTo("root value:null\n" +
+                " |-- id value:id_1_0\n" +
+                " |-- person value:null\n" +
+                " |    |-- name value:name_1_0\n" +
+                " |    |-- age value:10\n" +
+                " |-- person value:null\n" +
+                " |    |-- name value:name_1_1\n" +
+                " |    |-- sex value:null\n" +
+                " |    |-- age value:11\n" +
+                " |-- person value:null\n" +
+                " |    |-- name value:name_1_2\n" +
+                " |    |-- sex value:sex_1_2\n" +
+                " |    |-- age value:12\n" +
+                " |-- person value:null\n" +
+                " |    |-- name value:name_1_3\n" +
+                " |    |-- sex value:Male\n" +
+                " |    |-- age value:13\n" +
+                "\n" +
+                "root value:null\n" +
+                " |-- id value:id_2_0\n" +
+                " |-- person value:null\n" +
+                " |    |-- name value:name_2_0\n" +
+                " |    |-- age value:20\n" +
+                " |-- person value:null\n" +
+                " |    |-- name value:name_2_1\n" +
+                " |    |-- sex value:null\n" +
+                " |    |-- age value:21\n" +
+                " |-- person value:null\n" +
+                " |    |-- name value:name_2_2\n" +
+                " |    |-- sex value:sex_2_2\n" +
+                " |    |-- age value:22\n" +
+                " |-- person value:null\n" +
+                " |    |-- name value:name_2_3\n" +
+                " |    |-- sex value:Male\n" +
+                " |    |-- age value:23\n\n");
+
     }
 }

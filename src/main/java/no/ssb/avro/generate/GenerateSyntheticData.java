@@ -9,7 +9,7 @@ import java.util.Iterator;
 public class GenerateSyntheticData implements Iterable<DataElement> {
 
     public interface FieldHandler {
-        String field(SchemaBuddy schema, int rowNum, int arrayElementNum);
+        GeneratedField field(SchemaBuddy schema, int rowNum, int arrayElementNum);
     }
 
     public interface ChildCountHandler {
@@ -52,19 +52,30 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
                 }
                 continue;
             }
-
             DataElement childElement = new DataElement(childSchema.getName());
-            dataElement.addChild(childElement);
             if (childSchema.isSimpleType()) {
-                childElement.setValue(getData(childSchema, arrayElementCount));
+                GeneratedField generatedField = getData(childSchema, arrayElementCount);
+                switch (generatedField.status) {
+                    case IS_GENERATED:
+                    case VALUE:
+                    case NULL:
+                        dataElement.addChild(childElement);
+                        childElement.setValue(generatedField.value);
+                        break;
+                    case MISSING:
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + generatedField.status);
+                }
             } else {
+                dataElement.addChild(childElement);
                 generate(childElement, childSchema, arrayElementCount);
             }
         }
         return dataElement;
     }
 
-    String getData(SchemaBuddy schema, int arrayElementCount) {
+    GeneratedField getData(SchemaBuddy schema, int arrayElementCount) {
         return fieldHandler.field(schema, rowNum, arrayElementCount);
     }
 

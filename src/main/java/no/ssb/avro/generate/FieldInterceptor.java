@@ -6,13 +6,36 @@ import org.apache.avro.Schema;
 import java.util.Random;
 
 public abstract class FieldInterceptor implements GenerateSyntheticData.Interceptor {
-    private final Random random = new Random(0);
+    protected final Random random;
 
-    protected String generatedData(SchemaBuddy schema, int rowNum, int arrayElementNum) {
+    public FieldInterceptor() {
+        random = new Random();
+    }
+
+    public FieldInterceptor(long seed) {
+        random = new Random(seed);
+    }
+
+    @Override
+    public GeneratedField field(SchemaBuddy schema, int rowNum, int arrayElementNum) {
+        GeneratedField fieldResult = handleField(schema, rowNum, arrayElementNum);
+        if(fieldResult.shouldAutoGenerate()) {
+            return generatedData(schema, rowNum, arrayElementNum);
+        }
+        return fieldResult;
+    }
+
+    protected abstract GeneratedField handleField(SchemaBuddy schema, int rowNum, int arrayElementNum);
+
+    protected GeneratedField createRandom(int bound) {
+        return GeneratedField.fromLong(random.nextInt(bound));
+    }
+
+    protected GeneratedField generatedData(SchemaBuddy schema, int rowNum, int arrayElementNum) {
         assert schema.isSimpleType();
         if (schema.getType() == Schema.Type.STRING) {
-            return schema.getName() + "_" + rowNum + "_" + arrayElementNum;
+            return GeneratedField.fromGeneratedValue(schema.getName() + "_" + rowNum + "_" + arrayElementNum);
         }
-        return Integer.toString(random.nextInt(100_000));
+        return GeneratedField.fromGeneratedValue(Integer.toString(random.nextInt(100_000)));
     }
 }
