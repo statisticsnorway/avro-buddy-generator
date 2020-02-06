@@ -51,6 +51,11 @@ class GenerateSyntheticDataTest {
         public boolean skipRecord(SchemaBuddy schema, int rowNum, int level) {
             return false;
         }
+
+        @Override
+        public boolean skipField(SchemaBuddy schema, int rowNum, int level) {
+            return false;
+        }
     }
 
     TestInterceptor fieldChildGenerator = new TestInterceptor();
