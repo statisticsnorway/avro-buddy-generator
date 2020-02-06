@@ -34,11 +34,16 @@ public class GeneratedField {
         return new GeneratedField(value, Status.IS_GENERATED);
     }
 
+    public static GeneratedField fromGeneratedBoolean(boolean value) {
+        return new GeneratedField(Boolean.toString(value), Status.IS_GENERATED);
+    }
+
+
     boolean shouldAutoGenerate() {
         return status == Status.SHOULD_BE_GENERATED;
     }
 
-     boolean hasValue() {
+    boolean hasValue() {
         return status == Status.IS_GENERATED || status == Status.VALUE;
     }
 

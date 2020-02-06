@@ -7,7 +7,6 @@ import org.apache.avro.SchemaBuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.registerCustomDateFormat;
 
 class GenerateSyntheticDataTest {
 
@@ -47,6 +46,11 @@ class GenerateSyntheticDataTest {
         public int getChildCount(int rowNum) {
             return 4;
         }
+
+        @Override
+        public boolean skipRecord(SchemaBuddy schema, int rowNum, int level) {
+            return false;
+        }
     }
 
     TestInterceptor fieldChildGenerator = new TestInterceptor();
@@ -57,7 +61,7 @@ class GenerateSyntheticDataTest {
 
         StringBuilder sb = new StringBuilder();
         for (DataElement element : generateSyntheticData) {
-            sb.append(element.toString(true) + "\n");
+            sb.append(element.toString(true)).append("\n");
         }
         assertThat(sb.toString()).isEqualTo("root value:null\n" +
                 " |-- id value:id_1_0\n" +

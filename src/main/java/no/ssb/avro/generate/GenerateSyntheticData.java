@@ -12,11 +12,15 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
         GeneratedField field(SchemaBuddy schema, int rowNum, int arrayElementNum);
     }
 
+    public interface RecordInterceptor {
+        boolean skipRecord(SchemaBuddy schema, int rowNum, int level);
+    }
+
     public interface ChildCountHandler {
         int getChildCount(int rowNum);
     }
 
-    public interface Interceptor extends FieldHandler, ChildCountHandler {
+    public interface Interceptor extends FieldHandler, ChildCountHandler, RecordInterceptor {
 
     }
 
@@ -25,12 +29,14 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
     private final SchemaBuddy schemaBuddy;
     private final int numToGenerate;
     private final FieldHandler fieldHandler;
+    private final RecordInterceptor recordInterceptor;
     private final ChildCountHandler childCountHandler;
 
     public GenerateSyntheticData(Schema schema, int numToGenerate, Interceptor interceptor) {
         this.schemaBuddy = SchemaBuddy.parse(schema);
         this.numToGenerate = numToGenerate;
         this.fieldHandler = interceptor;
+        this.recordInterceptor = interceptor;
         this.childCountHandler = interceptor;
     }
 
@@ -40,14 +46,14 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
 
     DataElement generate() {
         DataElement root = new DataElement(schemaBuddy.getName());
-        return generate(root, schemaBuddy, 0);
+        return generate(root, schemaBuddy, 0, 0);
     }
 
-    DataElement generate(DataElement dataElement, SchemaBuddy schemaBuddy, int arrayElementCount) {
+    DataElement generate(DataElement dataElement, SchemaBuddy schemaBuddy, int arrayElementCount, int level) {
         for (SchemaBuddy childSchema : schemaBuddy.getChildren()) {
             if (childSchema.isArrayType()) {
                 for (int i = 0; i < childCountHandler.getChildCount(0); i++) {
-                    generate(dataElement, childSchema, i);
+                    generate(dataElement, childSchema, i, level + 1);
                     arrayElementCount++;
                 }
                 continue;
@@ -68,8 +74,11 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
                         throw new IllegalStateException("Unexpected value: " + generatedField.status);
                 }
             } else {
+                if (schemaBuddy.isOptional() && recordInterceptor.skipRecord(schemaBuddy, rowNum, level)) {
+                    continue;
+                }
                 dataElement.addChild(childElement);
-                generate(childElement, childSchema, arrayElementCount);
+                generate(childElement, childSchema, arrayElementCount, level + 1);
             }
         }
         return dataElement;

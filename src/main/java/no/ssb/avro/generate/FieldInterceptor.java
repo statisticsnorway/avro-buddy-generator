@@ -19,7 +19,7 @@ public abstract class FieldInterceptor implements GenerateSyntheticData.Intercep
     @Override
     public GeneratedField field(SchemaBuddy schema, int rowNum, int arrayElementNum) {
         GeneratedField fieldResult = handleField(schema, rowNum, arrayElementNum);
-        if(fieldResult.shouldAutoGenerate()) {
+        if (fieldResult.shouldAutoGenerate()) {
             return generatedData(schema, rowNum, arrayElementNum);
         }
         return fieldResult;
@@ -35,6 +35,9 @@ public abstract class FieldInterceptor implements GenerateSyntheticData.Intercep
         assert schema.isSimpleType();
         if (schema.getType() == Schema.Type.STRING) {
             return GeneratedField.fromGeneratedValue(schema.getName() + "_" + rowNum + "_" + arrayElementNum);
+        }
+        if (schema.getType() == Schema.Type.BOOLEAN) {
+            return GeneratedField.fromGeneratedBoolean(random.nextBoolean());
         }
         return GeneratedField.fromGeneratedValue(Integer.toString(random.nextInt(100_000)));
     }
