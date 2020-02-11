@@ -65,7 +65,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
             }
             DataElement childElement = new DataElement(childSchema.getName());
             if (childSchema.isSimpleType()) {
-                if (schemaBuddy.isOptionalWithCheckOfAllChildren() && fieldInterceptor.skipField(schemaBuddy, rowNum, level)) {
+                if (childSchema.isOptionalWithCheckOfAllChildren() && fieldInterceptor.skipField(schemaBuddy, rowNum, level)) {
                     continue;
                 }
                 GeneratedField generatedField = getData(childSchema, arrayElementCount);
@@ -82,7 +82,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
                         throw new IllegalStateException("Unexpected value: " + generatedField.status);
                 }
             } else {
-                if (schemaBuddy.isOptionalWithCheckOfAllChildren() && recordInterceptor.skipRecord(schemaBuddy, rowNum, level)) {
+                if (childSchema.isOptionalWithCheckOfAllChildren() && recordInterceptor.skipRecord(schemaBuddy, rowNum, level)) {
                     continue;
                 }
                 dataElement.addChild(childElement);
@@ -99,7 +99,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
     @Override
     public Iterator<DataElement> iterator() {
 
-        return new Iterator<>() {
+        return new Iterator<DataElement>() {
             @Override
             public boolean hasNext() {
                 return rowNum < numToGenerate;
@@ -108,6 +108,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
             @Override
             public DataElement next() {
                 rowNum++;
+                if (rowNum % 100 == 0) System.out.print(rowNum + "\r");
                 return generate();
             }
         };

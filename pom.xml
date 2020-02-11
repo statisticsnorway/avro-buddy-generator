@@ -172,7 +172,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>11</source>
-                    <release>11</release>
+                    <release>8</release>
                     <meminitial>64m</meminitial>
                     <maxmem>512m</maxmem>
                 </configuration>
