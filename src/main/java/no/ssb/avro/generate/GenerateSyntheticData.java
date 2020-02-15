@@ -28,7 +28,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
 
     }
 
-    private int rowNum = 0;
+    private int rowNum;
 
     private final SchemaBuddy schemaBuddy;
     private final int numToGenerate;
@@ -37,13 +37,14 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
     private final FieldInterceptor fieldInterceptor;
     private final ChildCountHandler childCountHandler;
 
-    public GenerateSyntheticData(Schema schema, int numToGenerate, Interceptor interceptor) {
+    public GenerateSyntheticData(Schema schema, int numToGenerate, Interceptor interceptor, int startRowNum) {
         this.schemaBuddy = SchemaBuddy.parse(schema);
         this.numToGenerate = numToGenerate;
         this.fieldHandler = interceptor;
         this.recordInterceptor = interceptor;
         this.fieldInterceptor = interceptor;
         this.childCountHandler = interceptor;
+        this.rowNum = startRowNum;
     }
 
     public SchemaBuddy getSchemaBuddy() {

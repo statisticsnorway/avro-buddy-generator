@@ -62,7 +62,7 @@ class GenerateSyntheticDataTest {
 
     @Test
     void testOverrideChangeOfFields() {
-        GenerateSyntheticData generateSyntheticData = new GenerateSyntheticData(schema, 2, fieldChildGenerator);
+        GenerateSyntheticData generateSyntheticData = new GenerateSyntheticData(schema, 2, fieldChildGenerator, 0);
 
         StringBuilder sb = new StringBuilder();
         for (DataElement element : generateSyntheticData) {
