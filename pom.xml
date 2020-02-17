@@ -95,7 +95,7 @@
         <dependency>
             <groupId>no.ssb.avro.convert.core</groupId>
             <artifactId>avro-buddy-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -172,7 +172,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>11</source>
-                    <release>11</release>
+                    <release>8</release>
                     <meminitial>64m</meminitial>
                     <maxmem>512m</maxmem>
                 </configuration>
