@@ -66,7 +66,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
             }
             DataElement childElement = new DataElement(childSchema.getName());
             if (childSchema.isSimpleType()) {
-                if (childSchema.isOptionalWithCheckOfAllChildren() && fieldInterceptor.skipField(schemaBuddy, rowNum, level)) {
+                if (childSchema.isOptionalWithCheckOfAllChildren() && fieldInterceptor.skipField(childSchema, rowNum, level)) {
                     continue;
                 }
                 GeneratedField generatedField = getData(childSchema, arrayElementCount);
@@ -83,7 +83,7 @@ public class GenerateSyntheticData implements Iterable<DataElement> {
                         throw new IllegalStateException("Unexpected value: " + generatedField.status);
                 }
             } else {
-                if (childSchema.isOptionalWithCheckOfAllChildren() && recordInterceptor.skipRecord(schemaBuddy, rowNum, level)) {
+                if (childSchema.isOptionalWithCheckOfAllChildren() && recordInterceptor.skipRecord(childSchema, rowNum, level)) {
                     continue;
                 }
                 dataElement.addChild(childElement);
